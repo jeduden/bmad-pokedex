@@ -18,3 +18,9 @@ can you run commands?
 
 ---
 
+## 2025-12-12 17:39:53
+
+/bmad:core:agents:bmad-master
+
+---
+

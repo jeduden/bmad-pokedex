@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -5,6 +6,10 @@ import { cn } from '@/lib/utils'
 interface ITypeBadgeProps {
   /** Pokemon type name (e.g., "fire", "water") */
   type: string
+  /** Size variant */
+  size?: 'sm' | 'md' | 'lg'
+  /** Whether the badge should be clickable to navigate to browse by type */
+  interactive?: boolean
   /** Optional additional class names */
   className?: string
 }
@@ -34,21 +39,39 @@ const typeColorMap: Record<string, string> = {
 /** Types that need dark text for contrast */
 const darkTextTypes = new Set(['electric', 'normal', 'ground', 'ice', 'steel', 'fairy'])
 
+/** Size variant styles */
+const sizeClasses = {
+  sm: 'text-xs px-2 py-0.5',
+  md: 'text-sm px-2.5 py-0.5',
+  lg: 'text-base px-3 py-1',
+}
+
 /**
  * Badge component for displaying Pokemon types with appropriate colors
  */
-export function TypeBadge({ type, className }: ITypeBadgeProps) {
+export function TypeBadge({ type, size = 'md', interactive = false, className }: ITypeBadgeProps) {
+  const navigate = useNavigate()
   const colorClass = typeColorMap[type] || 'bg-muted'
   const textClass = darkTextTypes.has(type) ? 'text-black' : 'text-white'
+
+  const handleClick = () => {
+    if (interactive) {
+      navigate(`/browse?type=${type}`)
+    }
+  }
 
   return (
     <Badge
       className={cn(
         colorClass,
         textClass,
-        'capitalize border-0 hover:opacity-80',
+        sizeClasses[size],
+        'capitalize border-0',
+        interactive && 'cursor-pointer hover:opacity-80 hover:scale-105 transition-all',
+        !interactive && 'hover:opacity-100',
         className
       )}
+      onClick={interactive ? handleClick : undefined}
     >
       {type}
     </Badge>

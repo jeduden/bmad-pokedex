@@ -13,20 +13,21 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b bg-background">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <Link to="/" className="text-xl font-bold text-foreground shrink-0">
+    <header className="border-b bg-background sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+        <Link to="/" className="text-lg sm:text-xl font-bold text-foreground shrink-0 min-h-[44px] flex items-center">
           bmad-pokedex
         </Link>
 
         {/* Search Bar - centered */}
-        <SearchBar className="hidden sm:block" />
+        <SearchBar className="hidden sm:block flex-1 max-w-md" />
 
-        <nav className="flex gap-2 shrink-0">
+        <nav className="flex gap-1 sm:gap-2 shrink-0">
           <Button
             asChild
             variant={isActive('/') ? 'default' : 'ghost'}
             size="sm"
+            className="min-h-[44px] min-w-[44px] px-3"
           >
             <Link to="/">Home</Link>
           </Button>
@@ -34,6 +35,7 @@ export default function Header() {
             asChild
             variant={isActive('/browse') ? 'default' : 'ghost'}
             size="sm"
+            className="min-h-[44px] min-w-[44px] px-3"
           >
             <Link to="/browse">Browse</Link>
           </Button>

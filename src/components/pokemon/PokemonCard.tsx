@@ -38,20 +38,21 @@ export function PokemonCard({ pokemon, onClick, className }: IPokemonCardProps) 
   return (
     <Card
       className={cn(
-        'w-full max-w-sm overflow-hidden transition-shadow hover:shadow-lg',
-        onClick && 'cursor-pointer',
+        'w-full max-w-sm overflow-hidden transition-all hover:shadow-lg',
+        onClick && 'cursor-pointer active:scale-[0.98]',
         className
       )}
       onClick={onClick}
     >
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center gap-4">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
           {/* Pokemon artwork */}
           {artwork && (
             <img
               src={artwork}
               alt={pokemon.name}
-              className="w-48 h-48 object-contain"
+              className="w-40 h-40 sm:w-48 sm:h-48 object-contain"
+              loading="eager"
             />
           )}
 
@@ -61,14 +62,14 @@ export function PokemonCard({ pokemon, onClick, className }: IPokemonCardProps) 
           </span>
 
           {/* Pokemon name */}
-          <h2 className="text-2xl font-bold text-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center">
             {capitalize(pokemon.name)}
           </h2>
 
           {/* Type badges */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap justify-center">
             {pokemon.types.map((typeSlot) => (
-              <TypeBadge key={typeSlot.slot} type={typeSlot.type.name} />
+              <TypeBadge key={typeSlot.slot} type={typeSlot.type.name} interactive />
             ))}
           </div>
         </div>

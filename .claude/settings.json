@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm test:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx jest:*)",
+      "Bash(npm run dev & sleep :* && pkill:*)",
+      "WebSearch",
+      "SlashCommand(/bmad:bmm:workflows:workflow-status)",
+      "SlashCommand(/bmad:bmm:workflows:workflow-init)",
+      "SlashCommand(/bmad:bmm:workflows:sprint-planning)",
+      "SlashCommand(/bmad:bmm:workflows:create-epics-and-stories)",
+      "SlashCommand(/bmad:bmm:workflows:epic-tech-context)",
+      "SlashCommand(/bmad:bmm:workflows:create-story)",
+      "SlashCommand(/bmad:bmm:workflows:story-context)",
+      "SlashCommand(/bmad:bmm:workflows:story-ready)",
+      "SlashCommand(/bmad:bmm:workflows:dev-story)",
+      "SlashCommand(/bmad:bmm:workflows:story-done)",
+      "SlashCommand(/bmad:bmm:workflows:code-review)",
+      "SlashCommand(/bmad:bmm:workflows:solutioning-gate-check)",
+      "SlashCommand(/bmad:bmm:workflows:correct-course)",
+      "SlashCommand(/bmad:bmm:workflows:retrospective)",
+      "SlashCommand(/bmad:bmm:workflows:prd)",
+      "SlashCommand(/bmad:bmm:workflows:architecture)",
+      "SlashCommand(/bmad:bmm:workflows:product-brief)",
+      "SlashCommand(/bmad:bmm:workflows:research)",
+      "SlashCommand(/bmad:bmm:workflows:brainstorm-project)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/log-prompt.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

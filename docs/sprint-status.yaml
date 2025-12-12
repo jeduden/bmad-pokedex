@@ -58,7 +58,7 @@ development_status:
   3-2-type-effectiveness-display: done
   3-3-evolution-chain-visualization: done
   3-4-type-badge-interaction: done
-  epic-3-retrospective: optional
+  epic-3-retrospective: done
 
   # Epic 4: Browse & Filter
   epic-4: contexted
@@ -66,11 +66,11 @@ development_status:
   4-2-type-filter: done
   4-3-generation-filter: done
   4-4-filter-state-persistence: done
-  epic-4-retrospective: optional
+  epic-4-retrospective: done
 
   # Epic 5: Polish & Performance
-  epic-5: backlog
-  5-1-caching-layer: backlog
-  5-2-loading-error-states: backlog
-  5-3-mobile-optimization: backlog
-  epic-5-retrospective: optional
+  epic-5: contexted
+  5-1-caching-layer: done
+  5-2-loading-error-states: done
+  5-3-mobile-optimization: done
+  epic-5-retrospective: done

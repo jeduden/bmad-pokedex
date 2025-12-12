@@ -45,7 +45,7 @@ npm install -D prettier eslint-config-prettier
 | Routing | React Router | v6 | Navigation | Standard React routing |
 | API State | TanStack Query | v5 | API calls | Caching, loading states, refetch |
 | HTTP Client | Native fetch | - | API calls | Simple, no extra dependency |
-| Testing | Vitest + RTL | Latest | All | Fast, Vite-native |
+| Testing | Not implemented | - | - | Deferred - to be added in future epic |
 | Linting | ESLint + Prettier | Latest | All | Code consistency |
 
 ## Project Structure
@@ -89,9 +89,9 @@ bmad-pokedex/
 │   ├── App.tsx                    # Router setup
 │   ├── main.tsx                   # Entry point
 │   └── index.css                  # Tailwind imports
-├── tests/
-│   ├── components/
-│   └── hooks/
+├── tests/                        # Not yet implemented
+│   ├── components/               # Future: Component tests
+│   └── hooks/                    # Future: Hook tests
 ├── .eslintrc.cjs
 ├── .prettierrc
 ├── tailwind.config.js
@@ -233,7 +233,7 @@ if (isLoading) {
 ### Code Organization
 
 - One component per file
-- Co-locate tests with components: `PokemonCard.test.tsx`
+- Tests not yet implemented (future: co-locate with components)
 - Shared types in `src/types/`
 - All API logic in `src/lib/api.ts`
 - All hooks in `src/hooks/`
@@ -354,7 +354,7 @@ cd bmad-pokedex
 npm install
 npm run dev     # Start dev server
 npm run build   # Production build
-npm run test    # Run tests
+npm run test    # Run tests (not yet implemented)
 npm run lint    # Lint code
 ```
 

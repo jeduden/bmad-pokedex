@@ -8,19 +8,25 @@
 
 ## Overview
 
-This document decomposes the PRD requirements into 5 epics with bite-sized stories for dev agent implementation. Each story is vertically sliced and completable in a single focused session.
+This document decomposes the PRD requirements into 9 epics with bite-sized stories for dev agent implementation. Each story is vertically sliced and completable in a single focused session.
 
 ### Epic Summary
 
-| Epic | Title | Stories | Focus |
-|------|-------|---------|-------|
-| 1 | Foundation & Setup | 4 | Project infrastructure |
-| 2 | Pokemon Discovery | 5 | Core MVP features |
-| 3 | Visual Enhancements | 4 | Stats, types, evolution |
-| 4 | Browse & Filter | 4 | Grid view, filtering |
-| 5 | Polish & Performance | 3 | Caching, UX, mobile |
+| Epic | Title | Stories | Focus | Status |
+|------|-------|---------|-------|--------|
+| 1 | Foundation & Setup | 4 | Project infrastructure | ✅ Complete |
+| 2 | Pokemon Discovery | 5 | Core MVP features | ✅ Complete |
+| 3 | Visual Enhancements | 4 | Stats, types, evolution | ✅ Complete |
+| 4 | Browse & Filter | 4 | Grid view, filtering | ✅ Complete |
+| 5 | Polish & Performance | 3 | Caching, UX, mobile | ✅ Complete |
+| **6** | **Testing Foundation** | **4** | **Vitest, hook tests, patterns** | **Backlog** |
+| **7** | **Comparison & Guided Paths** | **5** | **Compare UI, curated collections** | **Backlog** |
+| **8** | **Team Builder** | **4** | **6-slot team, weakness analyzer** | **Backlog** |
+| **9** | **Share & Social** | **3** | **URLs, copy/share, Open Graph** | **Backlog** |
 
-**Total Stories:** 20
+**MVP Stories (1-5):** 20 ✅
+**Growth Stories (6-9):** 16
+**Total Stories:** 36
 
 ---
 
@@ -629,6 +635,565 @@ Epic 5 (Polish) - can start after 2.4
 ```
 
 **Note:** Epics 3, 4, 5 can run in parallel after Epic 2.4 is complete.
+
+---
+
+## Epic 6: Testing Foundation
+
+**Goal:** Establish test infrastructure and cover critical untested hooks to enable confident development of new features.
+
+**Value:** Pays down 5 epics of technical debt, prevents regressions, enables safe refactoring.
+
+**PRD Coverage:** NFR (Quality), Retrospective Action Items
+
+**Gate:** MUST complete before Epic 7 begins.
+
+---
+
+### Story 6.1: Vitest Infrastructure Setup
+
+As a **developer**,
+I want **Vitest and React Testing Library configured**,
+So that **I can write and run tests for components and hooks**.
+
+**Acceptance Criteria:**
+
+**Given** the existing project
+**When** I run `npm run test`
+**Then** Vitest executes and reports results
+
+**And** React Testing Library is available for component tests
+**And** Hook testing utilities work for custom hooks
+**And** Coverage reporting is configured (`npm run test:coverage`)
+**And** Tests run in CI-compatible mode
+**And** VSCode test explorer integration works
+
+**Prerequisites:** None (first story of epic)
+
+**Technical Notes:**
+- Install: `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`
+- Configure `vitest.config.ts` with jsdom environment
+- Add test scripts to package.json
+- Create `src/test/setup.ts` for global test configuration
+- Add example test to verify setup works
+
+---
+
+### Story 6.2: Type Effectiveness Hook Tests
+
+As a **developer**,
+I want **unit tests for `useTypeEffectiveness`**,
+So that **type calculation logic is verified and protected from regressions**.
+
+**Acceptance Criteria:**
+
+**Given** the test infrastructure from Story 6.1
+**When** I run tests for `useTypeEffectiveness`
+**Then** all type calculation scenarios pass
+
+**And** single-type Pokemon effectiveness is tested (Fire weak to Water)
+**And** dual-type 4x weakness is tested (Grass/Flying 4x weak to Ice)
+**And** dual-type 0.25x resistance is tested
+**And** immunity scenarios are tested (Ground immune to Electric)
+**And** edge cases covered (no weaknesses, all immunities)
+
+**Prerequisites:** Story 6.1
+
+**Technical Notes:**
+- Test file: `src/hooks/__tests__/useTypeEffectiveness.test.ts`
+- Mock PokeAPI type data responses
+- Test pure calculation functions separately from hook
+- Minimum 10 test cases covering the type matrix
+
+---
+
+### Story 6.3: Filter Hooks Tests
+
+As a **developer**,
+I want **unit tests for `useFilterParams` and `useBrowsePokemon`**,
+So that **filter logic is verified and URL state is reliable**.
+
+**Acceptance Criteria:**
+
+**Given** test infrastructure is set up
+**When** I run tests for filter hooks
+**Then** all filter scenarios pass
+
+**And** URL param parsing is tested (single type, multiple types, generation)
+**And** URL param serialization is tested
+**And** Type OR logic is verified
+**And** Type + Generation AND combination is tested
+**And** Empty/invalid params handled gracefully
+**And** Filter clearing resets to defaults
+
+**Prerequisites:** Story 6.2
+
+**Technical Notes:**
+- Test files: `src/hooks/__tests__/useFilterParams.test.ts`, `useBrowsePokemon.test.ts`
+- Mock `useSearchParams` from React Router
+- Test filter combination logic thoroughly
+- Include edge cases: no filters, all filters, invalid values
+
+---
+
+### Story 6.4: Testing Patterns Documentation
+
+As a **developer**,
+I want **documented testing patterns and updated Story DoD**,
+So that **all future stories include tests consistently**.
+
+**Acceptance Criteria:**
+
+**Given** tests exist for hooks
+**When** I reference the testing documentation
+**Then** I understand how to write tests for new code
+
+**And** `docs/testing-patterns.md` documents hook testing approach
+**And** Component testing patterns are documented
+**And** Mocking patterns for PokeAPI are documented
+**And** Story DoD template includes "Unit tests pass" criterion
+**And** Code review checklist includes test verification
+
+**Prerequisites:** Story 6.3
+
+**Technical Notes:**
+- Create `docs/testing-patterns.md` with examples
+- Update story template to include test requirements
+- Document mock data location and patterns
+- Include coverage expectations (aim for 80%+ on new code)
+
+---
+
+## Epic 7: Comparison & Guided Paths
+
+**Goal:** Enable users to compare Pokemon side-by-side and discover curated collections for faster engagement.
+
+**Value:** Transforms passive browsing into active analysis; reduces time-to-first-meaningful-interaction for newcomers.
+
+**PRD Coverage:** Growth Features - "Side-by-side Pokemon comparison tool", "Guided paths for newcomers"
+
+---
+
+### Story 7.1: Comparison Selection UI
+
+As a **user**,
+I want **to select two Pokemon for comparison**,
+So that **I can analyze them side-by-side**.
+
+**Acceptance Criteria:**
+
+**Given** I am browsing Pokemon
+**When** I click "Compare" on a Pokemon card
+**Then** that Pokemon is added to a comparison tray
+
+**And** comparison tray shows up to 2 selected Pokemon
+**And** tray is visible across all pages (persistent)
+**And** I can remove Pokemon from the tray
+**And** "Compare Now" button activates when 2 Pokemon selected
+**And** tray collapses when empty
+
+**Prerequisites:** Epic 6 complete (tests required)
+
+**Technical Notes:**
+- Create `ComparisonTray` component (fixed bottom bar)
+- Create `useComparisonSelection` hook with Context
+- Add "Add to Compare" button to PokemonCard and PokemonDetail
+- Persist selection in sessionStorage
+- **Tests:** Selection add/remove, max 2 limit, persistence
+
+---
+
+### Story 7.2: Side-by-Side Comparison View
+
+As a **user**,
+I want **to see two Pokemon compared side-by-side**,
+So that **I can evaluate their differences**.
+
+**Acceptance Criteria:**
+
+**Given** I have 2 Pokemon in comparison tray
+**When** I click "Compare Now"
+**Then** I navigate to `/compare?pokemon=25,6`
+
+**And** both Pokemon display side-by-side
+**And** stats show as parallel bar charts (easy visual comparison)
+**And** types displayed for both
+**And** height/weight compared
+**And** stat differences highlighted (green=higher, red=lower)
+**And** mobile view stacks vertically
+
+**Prerequisites:** Story 7.1
+
+**Technical Notes:**
+- Create `/compare` route and `ComparePage` component
+- Create `ComparisonStats` component with dual bars
+- URL contains both Pokemon IDs for shareability
+- Reuse `PokemonStats` visualization with comparison mode
+- **Tests:** Stat difference calculation, highlight logic
+
+---
+
+### Story 7.3: Type Matchup Comparison
+
+As a **user**,
+I want **to see how two Pokemon match up against each other**,
+So that **I understand battle dynamics**.
+
+**Acceptance Criteria:**
+
+**Given** I am on the comparison page
+**When** viewing Pikachu vs Charizard
+**Then** I see "Pikachu vs Charizard" effectiveness
+
+**And** "Pikachu attacking Charizard: 1x (neutral)"
+**And** "Charizard attacking Pikachu: 2x (super effective)"
+**And** mutual weaknesses highlighted
+**And** type advantages clearly visualized
+**And** dual-type calculations accurate
+
+**Prerequisites:** Story 7.2
+
+**Technical Notes:**
+- Create `TypeMatchupComparison` component
+- Reuse `useTypeEffectiveness` hook
+- Calculate both directions of type matchup
+- Visual indicator for advantage (arrows, colors)
+- **Tests:** Matchup calculation for various type combinations
+
+---
+
+### Story 7.4: Curated Collection Data
+
+As a **user**,
+I want **predefined Pokemon collections**,
+So that **I can explore themed groups easily**.
+
+**Acceptance Criteria:**
+
+**Given** curated collections are defined
+**When** I access a collection
+**Then** I see a focused list of Pokemon
+
+**And** "Starter Pokemon" includes all gen starters (27 Pokemon)
+**And** "Legendary Pokemon" includes all legendaries
+**And** "By Region" groups by game region
+**And** "Fan Favorites" includes popular Pokemon
+**And** Collections are easily extensible (JSON config)
+
+**Prerequisites:** Story 7.3
+
+**Technical Notes:**
+- Create `src/data/curated-collections.json`
+- Define collection schema: `{ id, name, description, pokemonIds[] }`
+- Collections: starters, legendaries, mythicals, pseudo-legendaries, regional
+- **Tests:** Collection data validation, ID ranges valid
+
+---
+
+### Story 7.5: Guided Paths UI
+
+As a **user**,
+I want **to browse curated collections from a discovery page**,
+So that **I can explore Pokemon without being overwhelmed**.
+
+**Acceptance Criteria:**
+
+**Given** I navigate to `/discover` or see discovery section on home
+**When** the page loads
+**Then** I see collection cards: "Starter Pokemon", "Legendaries", etc.
+
+**And** clicking a collection shows those Pokemon in grid
+**And** "Compare two from this collection" CTA is prominent
+**And** collection page URL is shareable (`/discover/starters`)
+**And** breadcrumb navigation back to collections
+**And** each collection shows Pokemon count
+
+**Prerequisites:** Story 7.4
+
+**Technical Notes:**
+- Create `/discover` route and `DiscoverPage`
+- Create `CollectionCard` and `CollectionGrid` components
+- Integrate with comparison selection
+- Add "Discover" link to main navigation
+- **Tests:** Collection loading, navigation, count display
+
+---
+
+## Epic 8: Team Builder
+
+**Goal:** Enable users to create 6-Pokemon teams and analyze their collective strengths and weaknesses.
+
+**Value:** Deepens emotional investment - users transition from browsing to creating. Team analysis provides practical value for game players.
+
+**PRD Coverage:** Growth Features - "Team builder with weakness analyzer"
+
+---
+
+### Story 8.1: Team Slot UI
+
+As a **user**,
+I want **to add Pokemon to a 6-slot team**,
+So that **I can build my dream team**.
+
+**Acceptance Criteria:**
+
+**Given** I am viewing any Pokemon
+**When** I click "Add to Team"
+**Then** that Pokemon is added to my team
+
+**And** team panel shows 6 slots (filled and empty)
+**And** team panel is accessible from all pages (sidebar or modal)
+**And** I can remove Pokemon from team slots
+**And** I can reorder Pokemon via drag-and-drop
+**And** duplicate Pokemon not allowed (same species)
+**And** team persists in localStorage
+
+**Prerequisites:** Epic 7 complete
+
+**Technical Notes:**
+- Create `TeamBuilder` component (collapsible sidebar)
+- Create `useTeam` hook with Context + localStorage
+- Create `TeamSlot` component (empty/filled states)
+- Add "Add to Team" button to Pokemon cards/detail
+- Use `@dnd-kit` or native drag-and-drop for reorder
+- **Tests:** Add/remove/reorder, duplicate prevention, persistence
+
+---
+
+### Story 8.2: Team Weakness Analyzer
+
+As a **user**,
+I want **to see my team's collective weaknesses**,
+So that **I can identify coverage gaps**.
+
+**Acceptance Criteria:**
+
+**Given** I have Pokemon in my team
+**When** I view team analysis
+**Then** I see aggregated type weaknesses
+
+**And** "Team weak to: Fire (3 Pokemon)" shows vulnerable types
+**And** "Team resists: Water (4 Pokemon)" shows covered types
+**And** Critical gaps highlighted (4+ Pokemon weak to same type)
+**And** Severity indicated by color (red=danger, yellow=caution)
+**And** Analysis updates live as team changes
+
+**Prerequisites:** Story 8.1
+
+**Technical Notes:**
+- Create `TeamWeaknessAnalyzer` component
+- Create `useTeamAnalysis` hook
+- Aggregate individual `useTypeEffectiveness` results
+- Count Pokemon weak/resistant to each type
+- Threshold for "critical": 3+ Pokemon weak to same type
+- **Tests:** Aggregation logic, threshold calculations, empty team
+
+---
+
+### Story 8.3: Type Coverage Calculator
+
+As a **user**,
+I want **to see what types my team can hit super-effectively**,
+So that **I can ensure offensive coverage**.
+
+**Acceptance Criteria:**
+
+**Given** I have Pokemon in my team
+**When** I view coverage analysis
+**Then** I see offensive type coverage
+
+**And** "Super effective against: 14/18 types" summary shown
+**And** Uncovered types listed explicitly
+**And** Which team member covers which types shown
+**And** STAB (Same Type Attack Bonus) considered
+**And** Visual coverage chart (18 types, green=covered)
+
+**Prerequisites:** Story 8.2
+
+**Technical Notes:**
+- Create `TypeCoverageChart` component
+- Extend `useTeamAnalysis` with offensive coverage
+- Consider Pokemon types as proxy for movesets (simplification)
+- Show coverage matrix: rows=team members, cols=enemy types
+- **Tests:** Coverage calculation, STAB logic, uncovered type detection
+
+---
+
+### Story 8.4: Team Management
+
+As a **user**,
+I want **to save, name, and manage multiple teams**,
+So that **I can keep different team compositions**.
+
+**Acceptance Criteria:**
+
+**Given** I have built a team
+**When** I click "Save Team"
+**Then** team is saved with a custom name
+
+**And** I can have up to 5 saved teams
+**And** team list shows all saved teams
+**And** I can load a saved team into the builder
+**And** I can delete saved teams
+**And** "New Team" clears current and starts fresh
+**And** Teams persist in localStorage
+
+**Prerequisites:** Story 8.3
+
+**Technical Notes:**
+- Extend `useTeam` hook with multi-team support
+- Create `TeamList` component for saved teams
+- LocalStorage schema: `{ teams: [{ id, name, pokemonIds, createdAt }] }`
+- Add team name input with default ("Team 1", "Team 2")
+- **Tests:** Save/load/delete, max teams limit, name validation
+
+---
+
+## Epic 9: Share & Social
+
+**Goal:** Make teams, comparisons, and Pokemon shareable to drive viral growth and social engagement.
+
+**Value:** Turns users into promoters - every shared team is organic marketing. Rich previews encourage clicks.
+
+**PRD Coverage:** Growth Features - "Share Pokemon/teams via link"
+
+---
+
+### Story 9.1: Shareable URLs
+
+As a **user**,
+I want **to share my team or comparison via URL**,
+So that **my friends can see what I created**.
+
+**Acceptance Criteria:**
+
+**Given** I have a team or comparison
+**When** I click "Share"
+**Then** a shareable URL is generated
+
+**And** team URL format: `/team?pokemon=25,6,94,149,143,131`
+**And** comparison URL format: `/compare?pokemon=25,6`
+**And** Pokemon detail remains at `/pokemon/:id`
+**And** URL is short enough for social sharing (<100 chars)
+**And** Invalid URLs show graceful error
+
+**Prerequisites:** Epic 8 complete
+
+**Technical Notes:**
+- Team serialization: comma-separated Pokemon IDs
+- Consider base64 encoding if more data needed later
+- Validate Pokemon IDs on load (1-1010 range)
+- Graceful handling of missing/invalid Pokemon
+- **Tests:** Serialization/deserialization, invalid URL handling
+
+---
+
+### Story 9.2: One-Click Copy & Share Actions
+
+As a **user**,
+I want **easy ways to copy and share links**,
+So that **sharing is frictionless**.
+
+**Acceptance Criteria:**
+
+**Given** I am viewing a shareable item (team, comparison, Pokemon)
+**When** I click the share button
+**Then** I see share options
+
+**And** "Copy Link" copies URL to clipboard with confirmation toast
+**And** "Share to Twitter" opens Twitter with pre-filled text
+**And** "Share to Reddit" opens Reddit submit
+**And** Native share sheet on mobile (Web Share API)
+**And** Share button visible on team builder, compare page, Pokemon detail
+
+**Prerequisites:** Story 9.1
+
+**Technical Notes:**
+- Create `ShareButton` component with dropdown
+- Use `navigator.clipboard.writeText()` for copy
+- Use `navigator.share()` for native mobile sharing (with fallback)
+- Pre-filled share text: "Check out my Pokemon team on bmad-pokedex!"
+- Twitter/Reddit URLs with encoded parameters
+- **Tests:** Copy functionality, share URL generation
+
+---
+
+### Story 9.3: Open Graph Previews
+
+As a **user**,
+I want **rich previews when I share links**,
+So that **my shares look attractive on social media**.
+
+**Acceptance Criteria:**
+
+**Given** I share a team URL on Twitter/Discord
+**When** the link preview loads
+**Then** a rich card appears with Pokemon imagery
+
+**And** Team preview shows team member sprites in grid
+**And** Comparison preview shows both Pokemon
+**And** Pokemon detail shows that Pokemon's artwork
+**And** Title, description meta tags are dynamic
+**And** Preview image is at least 1200x630px (Twitter card size)
+
+**Prerequisites:** Story 9.2
+
+**Technical Notes:**
+- Use `react-helmet-async` for dynamic meta tags
+- Open Graph tags: `og:title`, `og:description`, `og:image`, `og:url`
+- Twitter card tags: `twitter:card`, `twitter:image`
+- For team images: Consider client-side canvas generation or static fallback
+- Fallback: Generic bmad-pokedex preview image
+- **Tests:** Meta tag generation for each shareable type
+
+---
+
+## Requirement Traceability (Updated)
+
+| PRD Requirement | Stories |
+|-----------------|---------|
+| FR1: Random Pokemon | 2.1 |
+| FR2: Pokemon Search | 2.2, 2.3 |
+| FR3: Pokemon Detail | 2.4, 2.5, 3.1, 3.2, 3.3, 3.4 |
+| FR4: Type Filtering | 4.2, 3.4 |
+| FR5: Generation Filtering | 4.3 |
+| FR6: Pokemon Browse | 4.1, 4.4 |
+| NFR: Performance | 5.1, 5.2 |
+| NFR: Accessibility | 5.3 |
+| **Growth: Comparison** | 7.1, 7.2, 7.3 |
+| **Growth: Guided Paths** | 7.4, 7.5 |
+| **Growth: Team Builder** | 8.1, 8.2, 8.3, 8.4 |
+| **Growth: Share** | 9.1, 9.2, 9.3 |
+| **Retro: Testing Debt** | 6.1, 6.2, 6.3, 6.4 |
+
+---
+
+## Implementation Sequence (Updated)
+
+```
+Epic 1-5 (Complete - MVP)
+  └── 20 stories delivered, 0 tests
+
+Epic 6 (Testing Foundation) ─── GATE ───┐
+  └── 6.1 → 6.2 → 6.3 → 6.4             │
+                                         │
+Epic 7 (Comparison & Guided Paths) ◄────┘
+  └── 7.1 → 7.2 → 7.3 → 7.4 → 7.5
+                                  │
+                                  ▼
+Epic 8 (Team Builder)
+  └── 8.1 → 8.2 → 8.3 → 8.4
+                            │
+                            ▼
+Epic 9 (Share & Social)
+  └── 9.1 → 9.2 → 9.3
+```
+
+**Process Commitments:**
+- Story DoD includes passing tests (starting Epic 7)
+- Follow BMAD workflow - no single-commit epics
+- Track retro action items in sprint-status.yaml
+- Advisory notes escalate after 2 occurrences
 
 ---
 

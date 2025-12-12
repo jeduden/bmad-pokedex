@@ -74,3 +74,31 @@ development_status:
   5-2-loading-error-states: done
   5-3-mobile-optimization: done
   epic-5-retrospective: done
+
+  # Epic 6: Testing Foundation (GATE - must complete before Epic 7)
+  epic-6: backlog
+  6-1-vitest-infrastructure-setup: backlog
+  6-2-type-effectiveness-hook-tests: backlog
+  6-3-filter-hooks-tests: backlog
+  6-4-testing-patterns-documentation: backlog
+
+  # Epic 7: Comparison & Guided Paths
+  epic-7: backlog
+  7-1-comparison-selection-ui: backlog
+  7-2-side-by-side-comparison-view: backlog
+  7-3-type-matchup-comparison: backlog
+  7-4-curated-collection-data: backlog
+  7-5-guided-paths-ui: backlog
+
+  # Epic 8: Team Builder
+  epic-8: backlog
+  8-1-team-slot-ui: backlog
+  8-2-team-weakness-analyzer: backlog
+  8-3-type-coverage-calculator: backlog
+  8-4-team-management: backlog
+
+  # Epic 9: Share & Social
+  epic-9: backlog
+  9-1-shareable-urls: backlog
+  9-2-one-click-copy-share-actions: backlog
+  9-3-open-graph-previews: backlog

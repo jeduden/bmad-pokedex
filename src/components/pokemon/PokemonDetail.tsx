@@ -5,6 +5,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TypeBadge } from './TypeBadge'
+import { PokemonStats } from './PokemonStats'
+import { TypeEffectiveness } from './TypeEffectiveness'
+import { EvolutionChain } from './EvolutionChain'
 import { fetchPokemon } from '@/lib/api'
 import type { IPokemon } from '@/types/pokemon'
 
@@ -125,6 +128,18 @@ export function PokemonDetail({ pokemon, className }: IPokemonDetailProps) {
               <p className="text-lg font-semibold">{formatWeight(pokemon.weight)}</p>
             </div>
           </div>
+
+          {/* Base Stats */}
+          <PokemonStats stats={pokemon.stats} className="mt-6" />
+
+          {/* Type Effectiveness */}
+          <TypeEffectiveness
+            types={pokemon.types.map((t) => t.type.name)}
+            className="mt-6"
+          />
+
+          {/* Evolution Chain */}
+          <EvolutionChain pokemonId={pokemon.id} className="mt-6" />
 
           {/* Navigation buttons */}
           <div className="flex gap-4 mt-4">

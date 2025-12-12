@@ -61,11 +61,11 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Browse & Filter
-  epic-4: backlog
-  4-1-pokemon-grid-view: backlog
-  4-2-type-filter: backlog
-  4-3-generation-filter: backlog
-  4-4-filter-state-persistence: backlog
+  epic-4: contexted
+  4-1-pokemon-grid-view: done
+  4-2-type-filter: done
+  4-3-generation-filter: done
+  4-4-filter-state-persistence: done
   epic-4-retrospective: optional
 
   # Epic 5: Polish & Performance

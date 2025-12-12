@@ -1,37 +1,22 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Layout from '@/components/layout/Layout'
+import Home from '@/pages/Home'
+import Pokemon from '@/pages/Pokemon'
+import Browse from '@/pages/Browse'
+import NotFound from '@/pages/NotFound'
 
 function App() {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 gap-6">
-      <h1 className="text-4xl font-bold text-foreground mb-4">bmad-pokedex</h1>
-
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Search Pokemon</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input placeholder="Enter Pokemon name..." />
-          <Button className="w-full">Search</Button>
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-wrap gap-2 justify-center">
-        <Badge className={cn('bg-pokemon-fire text-white')}>Fire</Badge>
-        <Badge className={cn('bg-pokemon-water text-white')}>Water</Badge>
-        <Badge className={cn('bg-pokemon-grass text-white')}>Grass</Badge>
-        <Badge className={cn('bg-pokemon-electric text-black')}>Electric</Badge>
-        <Badge className={cn('bg-pokemon-psychic text-white')}>Psychic</Badge>
-        <Badge className={cn('bg-pokemon-dragon text-white')}>Dragon</Badge>
-      </div>
-
-      <p className="text-muted-foreground text-sm">
-        Pokemon discovery website - Coming soon!
-      </p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="pokemon/:id" element={<Pokemon />} />
+          <Route path="browse" element={<Browse />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 

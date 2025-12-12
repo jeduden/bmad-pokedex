@@ -37,8 +37,8 @@ story_location: "{project-root}/docs/stories"
 development_status:
   # Epic 1: Foundation & Setup
   epic-1: contexted
-  1-1-project-initialization: review
-  1-2-tailwind-shadcn-ui-setup: backlog
+  1-1-project-initialization: done
+  1-2-tailwind-shadcn-ui-setup: done
   1-3-routing-setup: backlog
   1-4-pokeapi-client-setup: backlog
   epic-1-retrospective: optional

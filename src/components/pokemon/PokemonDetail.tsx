@@ -1,7 +1,24 @@
+import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TypeBadge } from './TypeBadge'
+import { fetchPokemon } from '@/lib/api'
 import type { IPokemon } from '@/types/pokemon'
+
+const MAX_POKEMON = 1010
+
+/** Calculate previous Pokemon ID (wraps 1 → 1010) */
+function getPreviousId(id: number): number {
+  return id === 1 ? MAX_POKEMON : id - 1
+}
+
+/** Calculate next Pokemon ID (wraps 1010 → 1) */
+function getNextId(id: number): number {
+  return id === MAX_POKEMON ? 1 : id + 1
+}
 
 /** Props for PokemonDetail component */
 interface IPokemonDetailProps {
@@ -43,9 +60,29 @@ function formatWeight(hectograms: number): string {
  * Detail component for displaying full Pokemon information
  */
 export function PokemonDetail({ pokemon, className }: IPokemonDetailProps) {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const artwork =
     pokemon.sprites.other['official-artwork'].front_default ??
     pokemon.sprites.front_default
+
+  const previousId = getPreviousId(pokemon.id)
+  const nextId = getNextId(pokemon.id)
+
+  const handlePrevious = () => {
+    navigate(`/pokemon/${previousId}`)
+  }
+
+  const handleNext = () => {
+    navigate(`/pokemon/${nextId}`)
+  }
+
+  const handlePrefetch = (id: number) => {
+    queryClient.prefetchQuery({
+      queryKey: ['pokemon', id],
+      queryFn: () => fetchPokemon(id),
+    })
+  }
 
   return (
     <Card className={cn('w-full max-w-md overflow-hidden', className)}>
@@ -87,6 +124,28 @@ export function PokemonDetail({ pokemon, className }: IPokemonDetailProps) {
               <p className="text-sm text-muted-foreground">Weight</p>
               <p className="text-lg font-semibold">{formatWeight(pokemon.weight)}</p>
             </div>
+          </div>
+
+          {/* Navigation buttons */}
+          <div className="flex gap-4 mt-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handlePrevious}
+              onMouseEnter={() => handlePrefetch(previousId)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Previous Pokemon</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleNext}
+              onMouseEnter={() => handlePrefetch(nextId)}
+            >
+              <ChevronRight className="h-4 w-4" />
+              <span className="sr-only">Next Pokemon</span>
+            </Button>
           </div>
         </div>
       </CardContent>

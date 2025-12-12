@@ -1,0 +1,234 @@
+<story-context id="1-4-pokeapi-client-setup" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>4</storyId>
+    <title>PokeAPI Client Setup</title>
+    <status>drafted</status>
+    <generatedAt>2025-12-12</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/1-4-pokeapi-client-setup.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>developer</asA>
+    <iWant>a configured API client for PokeAPI</iWant>
+    <soThat>all components can fetch Pokemon data consistently</soThat>
+    <tasks>
+      <task id="1" ac="4">
+        <title>Install TanStack Query</title>
+        <subtasks>
+          <subtask>Run `npm install @tanstack/react-query`</subtask>
+          <subtask>Verify package added to package.json</subtask>
+        </subtasks>
+      </task>
+      <task id="2" ac="7">
+        <title>Create TypeScript Interfaces</title>
+        <subtasks>
+          <subtask>Create `src/types/pokemon.ts`</subtask>
+          <subtask>Define `IPokemon` interface with id, name, types, stats, sprites, height, weight</subtask>
+          <subtask>Define `IPokemonType` interface with slot and type object</subtask>
+          <subtask>Define `IPokemonStat` interface with base_stat and stat object</subtask>
+          <subtask>Define `ISprites` interface with front_default and official-artwork</subtask>
+          <subtask>Define `IPokemonListResponse` interface with count, next, previous, results</subtask>
+        </subtasks>
+      </task>
+      <task id="3" ac="1,2,3,6">
+        <title>Create API Client</title>
+        <subtasks>
+          <subtask>Create `src/lib/api.ts`</subtask>
+          <subtask>Define `BASE_URL` constant (`https://pokeapi.co/api/v2`)</subtask>
+          <subtask>Implement `fetchPokemon(idOrName: string | number): Promise&lt;IPokemon&gt;`</subtask>
+          <subtask>Implement `fetchPokemonList(limit?: number, offset?: number): Promise&lt;IPokemonListResponse&gt;`</subtask>
+          <subtask>Handle HTTP errors (throw Error with descriptive message)</subtask>
+          <subtask>Export all functions</subtask>
+        </subtasks>
+      </task>
+      <task id="4" ac="4,5">
+        <title>Configure QueryClient</title>
+        <subtasks>
+          <subtask>Create QueryClient instance with defaultOptions</subtask>
+          <subtask>Set staleTime to 5 minutes (5 * 60 * 1000)</subtask>
+          <subtask>Wrap App with QueryClientProvider in main.tsx</subtask>
+          <subtask>Import and configure properly</subtask>
+        </subtasks>
+      </task>
+      <task id="5" ac="1,2,3">
+        <title>Create Pokemon Hooks</title>
+        <subtasks>
+          <subtask>Create `src/hooks/usePokemon.ts` - hook for fetching single Pokemon</subtask>
+          <subtask>Create `src/hooks/usePokemonList.ts` - hook for fetching Pokemon list</subtask>
+          <subtask>Use useQuery with proper queryKey patterns</subtask>
+          <subtask>Re-export from `src/hooks/index.ts` (create if needed)</subtask>
+        </subtasks>
+      </task>
+      <task id="6" ac="2,6,8">
+        <title>Verify Implementation</title>
+        <subtasks>
+          <subtask>Verify `npm run build` succeeds</subtask>
+          <subtask>Verify TypeScript compilation (`tsc --noEmit`)</subtask>
+          <subtask>Test API client manually (can add console.log in a component temporarily)</subtask>
+          <subtask>Verify error handling works for invalid Pokemon</subtask>
+        </subtasks>
+      </task>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">Importing the API client allows calling `fetchPokemon(idOrName)` and receiving Pokemon data</criterion>
+    <criterion id="AC2">`fetchPokemon(25)` returns Pikachu data successfully with correct structure</criterion>
+    <criterion id="AC3">`fetchPokemonList(limit, offset)` returns a paginated list of Pokemon</criterion>
+    <criterion id="AC4">TanStack Query is installed and QueryClientProvider wraps the application in main.tsx</criterion>
+    <criterion id="AC5">Default staleTime is configured to 5 minutes (300,000ms)</criterion>
+    <criterion id="AC6">API errors (e.g., 404 for invalid Pokemon) throw errors that can be caught and handled gracefully</criterion>
+    <criterion id="AC7">TypeScript interfaces (`IPokemon`, `IPokemonType`, `IPokemonStat`, `ISprites`, `IPokemonListResponse`) are defined in `src/types/pokemon.ts`</criterion>
+    <criterion id="AC8">`npm run build` succeeds without TypeScript errors</criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Technology Stack Details, Implementation Patterns</section>
+        <snippet>TanStack Query v5 for API state management. Native fetch for HTTP. staleTime 5 minutes for Pokemon data. Hook pattern: useQuery with queryKey.</snippet>
+      </doc>
+      <doc>
+        <path>docs/tech-spec-epic-1.md</path>
+        <title>Epic 1 Technical Specification</title>
+        <section>Detailed Design, APIs and Interfaces</section>
+        <snippet>Defines IPokemon, IPokemonType, IPokemonStat, ISprites interfaces. API client functions fetchPokemon() and fetchPokemonList() with error handling.</snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>Non-Functional Requirements, Integration</section>
+        <snippet>PokeAPI.co integration. Endpoints: /pokemon/{id}, /pokemon?limit&amp;offset. Rate limiting: fair use. Error handling: graceful fallback.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic Breakdown</title>
+        <section>Story 1.4: PokeAPI Client Setup</section>
+        <snippet>As a developer, I want a configured API client for PokeAPI, so that all components can fetch Pokemon data consistently.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <file>
+        <path>src/main.tsx</path>
+        <kind>entry-point</kind>
+        <symbol>createRoot, App</symbol>
+        <lines>1-10</lines>
+        <reason>Needs modification to wrap App with QueryClientProvider</reason>
+      </file>
+      <file>
+        <path>src/lib/utils.ts</path>
+        <kind>utility</kind>
+        <symbol>cn</symbol>
+        <lines>1-6</lines>
+        <reason>Existing lib folder structure - api.ts will be created alongside</reason>
+      </file>
+      <file>
+        <path>src/pages/Home.tsx</path>
+        <kind>page-component</kind>
+        <symbol>Home</symbol>
+        <lines>1-46</lines>
+        <reason>Will consume usePokemon/useRandomPokemon hooks in future stories</reason>
+      </file>
+      <file>
+        <path>src/pages/Pokemon.tsx</path>
+        <kind>page-component</kind>
+        <symbol>Pokemon</symbol>
+        <reason>Will consume usePokemon hook to fetch Pokemon by :id param</reason>
+      </file>
+      <file>
+        <path>src/pages/Browse.tsx</path>
+        <kind>page-component</kind>
+        <symbol>Browse</symbol>
+        <reason>Will consume usePokemonList hook for grid view</reason>
+      </file>
+      <file>
+        <path>tsconfig.json</path>
+        <kind>config</kind>
+        <symbol>paths</symbol>
+        <lines>8-11</lines>
+        <reason>Path aliases configured: @/* maps to ./src/* - use for imports</reason>
+      </file>
+    </code>
+    <dependencies>
+      <ecosystem name="node">
+        <package name="react" version="^18.3.1" />
+        <package name="react-dom" version="^18.3.1" />
+        <package name="react-router-dom" version="^7.10.1" />
+        <package name="typescript" version="~5.6.2" />
+        <package name="vite" version="^6.0.1" />
+        <package name="tailwindcss" version="^3.4.19" />
+        <package name="@tanstack/react-query" version="^5.x" status="TO_INSTALL" />
+      </ecosystem>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint source="architecture.md">Use TanStack Query v5 for all API calls - no direct fetch in components</constraint>
+    <constraint source="architecture.md">Use native fetch, no axios dependency</constraint>
+    <constraint source="architecture.md">staleTime: 5 minutes (300,000ms) for Pokemon data</constraint>
+    <constraint source="architecture.md">Type naming: PascalCase with I prefix for interfaces (IPokemon, IPokemonType)</constraint>
+    <constraint source="architecture.md">Hook naming: camelCase with use prefix (usePokemon, usePokemonList)</constraint>
+    <constraint source="architecture.md">Use @/ path aliases for all imports</constraint>
+    <constraint source="architecture.md">One component/hook per file</constraint>
+    <constraint source="tech-spec">Base URL: https://pokeapi.co/api/v2</constraint>
+    <constraint source="tech-spec">Error handling: HTTP 404 throws Error("Pokemon not found: {id}")</constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>fetchPokemon</name>
+      <kind>function</kind>
+      <signature>fetchPokemon(idOrName: string | number): Promise&lt;IPokemon&gt;</signature>
+      <path>src/lib/api.ts (TO CREATE)</path>
+    </interface>
+    <interface>
+      <name>fetchPokemonList</name>
+      <kind>function</kind>
+      <signature>fetchPokemonList(limit?: number, offset?: number): Promise&lt;IPokemonListResponse&gt;</signature>
+      <path>src/lib/api.ts (TO CREATE)</path>
+    </interface>
+    <interface>
+      <name>usePokemon</name>
+      <kind>hook</kind>
+      <signature>usePokemon(idOrName: string | number): UseQueryResult&lt;IPokemon&gt;</signature>
+      <path>src/hooks/usePokemon.ts (TO CREATE)</path>
+    </interface>
+    <interface>
+      <name>usePokemonList</name>
+      <kind>hook</kind>
+      <signature>usePokemonList(limit?: number, offset?: number): UseQueryResult&lt;IPokemonListResponse&gt;</signature>
+      <path>src/hooks/usePokemonList.ts (TO CREATE)</path>
+    </interface>
+    <interface>
+      <name>IPokemon</name>
+      <kind>interface</kind>
+      <signature>interface IPokemon { id: number; name: string; types: IPokemonType[]; stats: IPokemonStat[]; sprites: ISprites; height: number; weight: number; }</signature>
+      <path>src/types/pokemon.ts (TO CREATE)</path>
+    </interface>
+    <interface>
+      <name>IPokemonListResponse</name>
+      <kind>interface</kind>
+      <signature>interface IPokemonListResponse { count: number; next: string | null; previous: string | null; results: { name: string; url: string }[]; }</signature>
+      <path>src/types/pokemon.ts (TO CREATE)</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>TypeScript compilation check (tsc --noEmit) and production build verification (npm run build) are the primary validation methods. Manual API testing via console.log in components. No unit test framework configured yet (Vitest planned for later stories).</standards>
+    <locations>
+      <location>tests/ (future - not yet created)</location>
+      <location>src/**/*.test.ts (future - co-located tests)</location>
+    </locations>
+    <ideas>
+      <idea ac="AC2">Manual test: Call fetchPokemon(25) and verify response contains name: "pikachu", id: 25, types array with "electric"</idea>
+      <idea ac="AC3">Manual test: Call fetchPokemonList(20, 0) and verify response has count > 0, results array with 20 items</idea>
+      <idea ac="AC6">Manual test: Call fetchPokemon("invalid-pokemon-xyz") and verify it throws Error with descriptive message</idea>
+      <idea ac="AC4,AC5">Code review: Verify QueryClientProvider wraps App in main.tsx with staleTime: 300000</idea>
+      <idea ac="AC8">Build verification: Run npm run build and tsc --noEmit without errors</idea>
+    </ideas>
+  </tests>
+</story-context>

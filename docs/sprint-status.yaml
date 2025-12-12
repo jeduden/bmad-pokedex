@@ -44,7 +44,7 @@ development_status:
   epic-1-retrospective: done
 
   # Epic 2: Pokemon Discovery
-  epic-2: backlog
+  epic-2: contexted
   2-1-random-pokemon-display: backlog
   2-2-pokemon-search-input: backlog
   2-3-search-result-navigation: backlog

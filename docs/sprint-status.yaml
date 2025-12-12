@@ -41,7 +41,7 @@ development_status:
   1-2-tailwind-shadcn-ui-setup: done
   1-3-routing-setup: done
   1-4-pokeapi-client-setup: done
-  epic-1-retrospective: optional
+  epic-1-retrospective: done
 
   # Epic 2: Pokemon Discovery
   epic-2: backlog

@@ -47,7 +47,7 @@ development_status:
   epic-2: contexted
   2-1-random-pokemon-display: done
   2-2-pokemon-search-input: done
-  2-3-search-result-navigation: backlog
+  2-3-search-result-navigation: done
   2-4-pokemon-detail-page-basic: backlog
   2-5-pokemon-navigation: backlog
   epic-2-retrospective: optional

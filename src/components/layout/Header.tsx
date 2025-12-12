@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { SearchBar } from '@/components/pokemon/SearchBar'
 
 export default function Header() {
   const location = useLocation()
@@ -13,11 +14,15 @@ export default function Header() {
 
   return (
     <header className="border-b bg-background">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-foreground">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <Link to="/" className="text-xl font-bold text-foreground shrink-0">
           bmad-pokedex
         </Link>
-        <nav className="flex gap-2">
+
+        {/* Search Bar - centered */}
+        <SearchBar className="hidden sm:block" />
+
+        <nav className="flex gap-2 shrink-0">
           <Button
             asChild
             variant={isActive('/') ? 'default' : 'ghost'}
@@ -33,6 +38,11 @@ export default function Header() {
             <Link to="/browse">Browse</Link>
           </Button>
         </nav>
+      </div>
+
+      {/* Mobile search bar - below header */}
+      <div className="container mx-auto px-4 pb-3 sm:hidden">
+        <SearchBar className="w-full" />
       </div>
     </header>
   )

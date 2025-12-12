@@ -1,3 +1,5 @@
 export { usePokemon } from './usePokemon'
 export { usePokemonList } from './usePokemonList'
 export { useRandomPokemon } from './useRandomPokemon'
+export { useDebounce } from './useDebounce'
+export { usePokemonSearch } from './usePokemonSearch'

@@ -15,6 +15,7 @@
       "Bash(npm test:*)",
       "Bash(npx vitest:*)",
       "Bash(npx jest:*)",
+      "Bash(npm run dev & sleep :* && pkill:*)",
       "WebSearch",
       "SlashCommand(/bmad:bmm:workflows:workflow-status)",
       "SlashCommand(/bmad:bmm:workflows:workflow-init)",

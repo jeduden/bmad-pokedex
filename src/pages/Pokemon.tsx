@@ -46,14 +46,14 @@ export default function Pokemon() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 gap-6">
+    <div className="flex flex-col items-center justify-center p-4 gap-6 min-h-[60vh]">
       {isLoading ? (
         <PokemonDetailSkeleton />
       ) : pokemon ? (
         <PokemonDetail pokemon={pokemon} />
       ) : null}
 
-      <Button asChild variant="outline">
+      <Button asChild variant="outline" className="min-h-[44px]">
         <Link to="/">Back to Home</Link>
       </Button>
     </div>

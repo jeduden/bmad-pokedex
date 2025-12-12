@@ -122,7 +122,7 @@ export default function Browse() {
             )}
           </p>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="min-h-[44px]">
               Clear all filters
             </Button>
           )}
@@ -141,7 +141,7 @@ export default function Browse() {
           <p className="text-muted-foreground text-lg mb-4">
             No Pokemon found matching your filters
           </p>
-          <Button variant="outline" onClick={clearFilters}>
+          <Button variant="outline" onClick={clearFilters} className="min-h-[44px]">
             Clear filters
           </Button>
         </div>
@@ -172,7 +172,7 @@ export default function Browse() {
               <Button
                 variant="outline"
                 onClick={() => fetchNextPage()}
-                className="px-8"
+                className="px-8 min-h-[44px]"
               >
                 Load More
               </Button>

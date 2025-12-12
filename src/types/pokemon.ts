@@ -60,3 +60,62 @@ export interface IPokemonListResponse {
   previous: string | null
   results: IPokemonListItem[]
 }
+
+/** Named resource helper (common PokeAPI pattern) */
+export interface INamedResource {
+  name: string
+  url: string
+}
+
+/** Type damage relations from PokeAPI /type/{id} */
+export interface ITypeRelations {
+  double_damage_from: INamedResource[]
+  double_damage_to: INamedResource[]
+  half_damage_from: INamedResource[]
+  half_damage_to: INamedResource[]
+  no_damage_from: INamedResource[]
+  no_damage_to: INamedResource[]
+}
+
+/** Type response with damage relations */
+export interface ITypeResponse {
+  id: number
+  name: string
+  damage_relations: ITypeRelations
+}
+
+/** Calculated effectiveness result */
+export interface ITypeEffectiveness {
+  weaknesses: { type: string; multiplier: number }[]
+  resistances: { type: string; multiplier: number }[]
+  immunities: string[]
+}
+
+/** Evolution detail from PokeAPI */
+export interface IEvolutionDetail {
+  trigger: INamedResource
+  min_level: number | null
+  item: INamedResource | null
+}
+
+/** Evolution node in the chain */
+export interface IEvolutionNode {
+  species: INamedResource
+  evolution_details: IEvolutionDetail[]
+  evolves_to: IEvolutionNode[]
+}
+
+/** Evolution chain from PokeAPI /evolution-chain/{id} */
+export interface IEvolutionChain {
+  id: number
+  chain: IEvolutionNode
+}
+
+/** Pokemon species for evolution chain reference */
+export interface IPokemonSpecies {
+  id: number
+  name: string
+  evolution_chain: {
+    url: string
+  }
+}

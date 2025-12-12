@@ -3,7 +3,13 @@
  * @see https://pokeapi.co/docs/v2
  */
 
-import type { IPokemon, IPokemonListResponse } from '@/types/pokemon'
+import type {
+  IPokemon,
+  IPokemonListResponse,
+  ITypeResponse,
+  IPokemonSpecies,
+  IEvolutionChain,
+} from '@/types/pokemon'
 
 const BASE_URL = 'https://pokeapi.co/api/v2'
 
@@ -50,10 +56,8 @@ export async function fetchPokemonList(
   return response.json()
 }
 
-/**
- * Response from the type endpoint
- */
-export interface ITypeResponse {
+/** Response from the type endpoint (for browse filtering) */
+export interface ITypeListResponse {
   id: number
   name: string
   pokemon: Array<{
@@ -66,12 +70,12 @@ export interface ITypeResponse {
 }
 
 /**
- * Fetch all Pokemon of a specific type
+ * Fetch all Pokemon of a specific type (for browse filtering)
  * @param type - Pokemon type name (e.g., "fire", "water")
  * @returns Promise resolving to type data with Pokemon list
  * @throws Error on network error
  */
-export async function fetchPokemonByType(type: string): Promise<ITypeResponse> {
+export async function fetchPokemonByType(type: string): Promise<ITypeListResponse> {
   const response = await fetch(`${BASE_URL}/type/${type}`)
 
   if (!response.ok) {
@@ -79,6 +83,64 @@ export async function fetchPokemonByType(type: string): Promise<ITypeResponse> {
   }
 
   return response.json()
+}
+
+/**
+ * Fetch type damage relations (for type effectiveness)
+ * @param name - Type name (e.g., "fire", "water")
+ * @returns Promise resolving to type data with damage relations
+ * @throws Error if type not found or network error
+ */
+export async function fetchType(name: string): Promise<ITypeResponse> {
+  const response = await fetch(`${BASE_URL}/type/${name}`)
+
+  if (!response.ok) {
+    throw new Error(`Type not found: ${name}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * Fetch Pokemon species data (for evolution chain)
+ * @param id - Pokemon ID
+ * @returns Promise resolving to species data
+ * @throws Error if species not found or network error
+ */
+export async function fetchPokemonSpecies(id: number): Promise<IPokemonSpecies> {
+  const response = await fetch(`${BASE_URL}/pokemon-species/${id}`)
+
+  if (!response.ok) {
+    throw new Error(`Species not found: ${id}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * Fetch evolution chain data
+ * @param id - Evolution chain ID
+ * @returns Promise resolving to evolution chain data
+ * @throws Error if chain not found or network error
+ */
+export async function fetchEvolutionChain(id: number): Promise<IEvolutionChain> {
+  const response = await fetch(`${BASE_URL}/evolution-chain/${id}`)
+
+  if (!response.ok) {
+    throw new Error(`Evolution chain not found: ${id}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * Extract ID from any PokeAPI URL
+ * @param url - PokeAPI URL (e.g., "https://pokeapi.co/api/v2/pokemon-species/25/")
+ * @returns ID number
+ */
+export function extractIdFromUrl(url: string): number {
+  const match = url.match(/\/(\d+)\/?$/)
+  return match ? parseInt(match[1], 10) : 0
 }
 
 /**

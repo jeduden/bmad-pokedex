@@ -1,101 +1,88 @@
-import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
-import { TypeBadge } from './TypeBadge'
-import { usePokemon } from '@/hooks'
 import { cn } from '@/lib/utils'
+import { TypeBadge } from './TypeBadge'
+import type { IPokemon } from '@/types/pokemon'
 
+/** Props for PokemonGridCard component */
 interface IPokemonGridCardProps {
-  /** Pokemon name or ID */
-  nameOrId: string | number
+  /** Pokemon data to display */
+  pokemon: IPokemon
+  /** Click handler for navigation */
+  onClick?: () => void
+  /** Optional additional class names */
   className?: string
 }
 
 /**
- * Compact Pokemon card for grid view with lazy loading
+ * Format Pokemon ID to #XXX format (e.g., #025)
  */
-export function PokemonGridCard({ nameOrId, className }: IPokemonGridCardProps) {
-  const { data: pokemon, isLoading, error } = usePokemon(nameOrId)
+function formatPokemonNumber(id: number): string {
+  return `#${id.toString().padStart(3, '0')}`
+}
 
-  // Extract ID from name/url if needed
-  const pokemonId = pokemon?.id
+/**
+ * Capitalize first letter of a string
+ */
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
 
-  // Format Pokemon ID with leading zeros
-  const formatId = (num: number) => `#${String(num).padStart(3, '0')}`
-
-  // Skeleton while loading
-  if (isLoading) {
-    return (
-      <Card className={cn('overflow-hidden', className)}>
-        <CardContent className="p-4">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-24 h-24 rounded bg-muted animate-pulse" />
-            <div className="w-10 h-4 rounded bg-muted animate-pulse" />
-            <div className="w-20 h-5 rounded bg-muted animate-pulse" />
-            <div className="flex gap-1">
-              <div className="w-12 h-5 rounded-full bg-muted animate-pulse" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  // Error state
-  if (error || !pokemon) {
-    return (
-      <Card className={cn('overflow-hidden opacity-50', className)}>
-        <CardContent className="p-4">
-          <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <div className="w-24 h-24 rounded bg-muted flex items-center justify-center">
-              <span className="text-2xl">?</span>
-            </div>
-            <span className="text-xs">Failed to load</span>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+/**
+ * Compact card component for displaying Pokemon in a grid layout
+ */
+export function PokemonGridCard({
+  pokemon,
+  onClick,
+  className,
+}: IPokemonGridCardProps) {
+  // Use smaller sprite for grid view
+  const sprite =
+    pokemon.sprites.other['official-artwork'].front_default ??
+    pokemon.sprites.front_default
 
   return (
-    <Link to={`/pokemon/${pokemonId}`}>
-      <Card className={cn(
-        'overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:scale-105 active:scale-100',
-        'min-h-[180px]',
+    <Card
+      className={cn(
+        'overflow-hidden transition-all hover:shadow-lg hover:scale-105',
+        onClick && 'cursor-pointer',
         className
-      )}>
-        <CardContent className="p-4">
-          <div className="flex flex-col items-center gap-2">
-            {/* Pokemon sprite */}
+      )}
+      onClick={onClick}
+    >
+      <CardContent className="p-4">
+        <div className="flex flex-col items-center gap-2">
+          {/* Pokemon sprite */}
+          {sprite && (
             <img
-              src={pokemon.sprites.front_default || pokemon.sprites.other['official-artwork'].front_default || ''}
+              src={sprite}
               alt={pokemon.name}
               className="w-24 h-24 object-contain"
               loading="lazy"
             />
+          )}
 
-            {/* Pokemon number */}
-            <span className="text-xs text-muted-foreground">
-              {formatId(pokemon.id)}
-            </span>
+          {/* Pokemon number */}
+          <span className="text-xs text-muted-foreground font-mono">
+            {formatPokemonNumber(pokemon.id)}
+          </span>
 
-            {/* Pokemon name */}
-            <span className="font-medium capitalize text-sm text-center">
-              {pokemon.name.replace('-', ' ')}
-            </span>
+          {/* Pokemon name */}
+          <h3 className="text-sm font-semibold text-foreground truncate w-full text-center">
+            {capitalize(pokemon.name)}
+          </h3>
 
-            {/* Type badges */}
-            <div className="flex gap-1 flex-wrap justify-center">
-              {pokemon.types.map((type) => (
-                <TypeBadge
-                  key={type.type.name}
-                  type={type.type.name}
-                  size="sm"
-                />
-              ))}
-            </div>
+          {/* Type badges - smaller */}
+          <div className="flex gap-1 flex-wrap justify-center">
+            {pokemon.types.map((typeSlot) => (
+              <TypeBadge
+                key={typeSlot.slot}
+                type={typeSlot.type.name}
+                className="text-xs px-2 py-0"
+              />
+            ))}
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

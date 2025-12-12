@@ -1,165 +1,187 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useBrowsePokemon, useFilterParams } from '@/hooks'
 import { PokemonGridCard } from '@/components/pokemon/PokemonGridCard'
-import { PokemonGridSkeleton } from '@/components/pokemon/PokemonGridSkeleton'
-import { TypeBadge } from '@/components/pokemon/TypeBadge'
+import { PokemonGridCardSkeleton } from '@/components/pokemon/PokemonGridCardSkeleton'
+import { TypeFilter } from '@/components/pokemon/TypeFilter'
+import { GenerationFilter } from '@/components/pokemon/GenerationFilter'
 import { ErrorState } from '@/components/ErrorState'
-import { usePokemonList } from '@/hooks'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
-// All Pokemon types
-const POKEMON_TYPES = [
-  'normal', 'fire', 'water', 'electric', 'grass', 'ice',
-  'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug',
-  'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy',
-]
-
-// Pokemon count per page
-const PAGE_SIZE = 20
-
+/**
+ * Browse page with Pokemon grid, infinite scroll, and filtering
+ */
 export default function Browse() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [page, setPage] = useState(0)
+  const navigate = useNavigate()
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
-  // Get type filter from URL
-  const selectedType = searchParams.get('type') || ''
+  // Filter state from URL params
+  const {
+    selectedTypes,
+    selectedGeneration,
+    setTypes,
+    setGeneration,
+    clearFilters,
+    hasActiveFilters,
+  } = useFilterParams()
 
-  // Fetch Pokemon list
-  const { data, isLoading, error, refetch } = usePokemonList(PAGE_SIZE, page * PAGE_SIZE)
+  // Fetch Pokemon with filters
+  const {
+    pokemon,
+    totalCount,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    error,
+    refetch,
+  } = useBrowsePokemon({
+    types: selectedTypes,
+    generation: selectedGeneration,
+  })
 
-  // Reset page when type filter changes
+  // Navigate to Pokemon detail page
+  const handlePokemonClick = useCallback(
+    (id: number) => {
+      navigate(`/pokemon/${id}`)
+    },
+    [navigate]
+  )
+
+  // Infinite scroll observer
   useEffect(() => {
-    setPage(0)
-  }, [selectedType])
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0]
+        if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 }
+    )
 
-  // Handle type filter click
-  const handleTypeClick = (type: string) => {
-    if (selectedType === type) {
-      // Clear filter if clicking same type
-      searchParams.delete('type')
-    } else {
-      searchParams.set('type', type)
+    const currentRef = loadMoreRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
     }
-    setSearchParams(searchParams)
-  }
 
-  // Clear all filters
-  const clearFilters = () => {
-    searchParams.delete('type')
-    setSearchParams(searchParams)
-  }
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  // Calculate pagination
-  const totalPages = data ? Math.ceil(data.count / PAGE_SIZE) : 0
-  const hasNextPage = data?.next !== null
-  const hasPrevPage = data?.previous !== null
+  // Show error state
+  if (error && !isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorState
+          message="Failed to load Pokemon"
+          onRetry={() => refetch()}
+        />
+      </div>
+    )
+  }
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      {/* Filters section */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Filter by Type</h2>
-              {selectedType && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="text-muted-foreground"
-                >
-                  Clear filters
-                </Button>
-              )}
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Browse Pokemon
+        </h1>
+        <p className="text-muted-foreground">
+          Explore all Pokemon with filters by type and generation
+        </p>
+      </div>
 
-            {/* Type filter pills */}
-            <div className="flex flex-wrap gap-2">
-              {POKEMON_TYPES.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => handleTypeClick(type)}
-                  className={cn(
-                    'transition-all rounded-full',
-                    selectedType === type && 'ring-2 ring-offset-2 ring-primary'
-                  )}
-                >
-                  <TypeBadge type={type} size="md" />
-                </button>
-              ))}
-            </div>
-
-            {/* Filter info */}
-            {selectedType && (
-              <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium capitalize">{selectedType}</span> type Pokemon
-                {data && ` (filtering from ${data.count} total)`}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Results section */}
-      {error ? (
-        <div className="flex justify-center py-12">
-          <ErrorState
-            message="Failed to load Pokemon. Please try again."
-            onRetry={() => refetch()}
+      {/* Filters Section */}
+      <div className="mb-8 space-y-6 p-4 rounded-lg border bg-card">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TypeFilter
+            selectedTypes={selectedTypes}
+            onTypesChange={setTypes}
+          />
+          <GenerationFilter
+            selectedGeneration={selectedGeneration}
+            onGenerationChange={setGeneration}
           />
         </div>
-      ) : isLoading ? (
-        <PokemonGridSkeleton count={PAGE_SIZE} />
-      ) : data?.results.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <p className="text-muted-foreground">No Pokemon found.</p>
-          </CardContent>
-        </Card>
+
+        {/* Filter summary */}
+        <div className="flex items-center justify-between pt-4 border-t">
+          <p className="text-sm text-muted-foreground">
+            {isLoading ? (
+              'Loading...'
+            ) : (
+              <>
+                Showing <span className="font-medium">{pokemon.length}</span> of{' '}
+                <span className="font-medium">{totalCount}</span> Pokemon
+              </>
+            )}
+          </p>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="min-h-[44px]">
+              Clear all filters
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Pokemon Grid */}
+      {isLoading && pokemon.length === 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <PokemonGridCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : pokemon.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground text-lg mb-4">
+            No Pokemon found matching your filters
+          </p>
+          <Button variant="outline" onClick={clearFilters} className="min-h-[44px]">
+            Clear filters
+          </Button>
+        </div>
       ) : (
         <>
-          {/* Pokemon grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {data?.results.map((pokemon) => (
+            {pokemon.map((p) => (
               <PokemonGridCard
-                key={pokemon.name}
-                nameOrId={pokemon.name}
+                key={p.id}
+                pokemon={p}
+                onClick={() => handlePokemonClick(p.id)}
               />
             ))}
           </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-center gap-4 py-4">
-            <Button
-              variant="outline"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={!hasPrevPage || isLoading}
-              className="min-h-[44px] min-w-[100px]"
-            >
-              Previous
-            </Button>
-
-            <span className="text-sm text-muted-foreground">
-              Page {page + 1} of {totalPages}
-            </span>
-
-            <Button
-              variant="outline"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={!hasNextPage || isLoading}
-              className="min-h-[44px] min-w-[100px]"
-            >
-              Next
-            </Button>
+          {/* Load more trigger / Loading indicator */}
+          <div
+            ref={loadMoreRef}
+            className="mt-8 flex justify-center"
+          >
+            {isFetchingNextPage ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <PokemonGridCardSkeleton key={`loading-${i}`} />
+                ))}
+              </div>
+            ) : hasNextPage ? (
+              <Button
+                variant="outline"
+                onClick={() => fetchNextPage()}
+                className="px-8 min-h-[44px]"
+              >
+                Load More
+              </Button>
+            ) : pokemon.length > 0 ? (
+              <p className="text-muted-foreground text-sm">
+                You've reached the end!
+              </p>
+            ) : null}
           </div>
-
-          {/* Total count */}
-          <p className="text-center text-sm text-muted-foreground">
-            {data?.count.toLocaleString()} Pokemon available
-          </p>
         </>
       )}
     </div>
